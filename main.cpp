@@ -1,6 +1,9 @@
 #include <iostream>
 #include <fstream>
 
+/**
+ * @brief The ImageProcessing class will find the distance of each pixel from the nearest boundary.
+ */
 class ImageProcessing
 {
 public:
@@ -22,6 +25,7 @@ private:
     int neighborAry[5];
 };
 
+//Initializes the 2D array with a one pixel thick frame around it
 ImageProcessing::ImageProcessing(int row, int col, int min, int max)
 {
     numRows = row;
@@ -36,6 +40,8 @@ ImageProcessing::ImageProcessing(int row, int col, int min, int max)
     }
 
 }
+
+//Initializes the frame to 0
 void ImageProcessing::zeroFramed()
 {
     for (int i = 0; i < numRows + 2; i++)
@@ -46,6 +52,8 @@ void ImageProcessing::zeroFramed()
         }
     }
 }
+
+//Loads the image into the 2D array
 void ImageProcessing::loadImage(std::ifstream& is)
 {
     for (int i = 1; i < numRows + 1; i++)
@@ -58,6 +66,7 @@ void ImageProcessing::loadImage(std::ifstream& is)
 
 }
 
+//Used by the first pass, this will load the top 3 and left neighboring pixels into a neighborAry
 void ImageProcessing::loadNeighbor(int row, int col)
 {
     neighborAry[0] = zeroFramedAry[row - 1][col - 1];
@@ -67,6 +76,7 @@ void ImageProcessing::loadNeighbor(int row, int col)
     neighborAry[4] = zeroFramedAry[row][col];
 }
 
+//Used by the second pass, this will load the bottom 3 and right neighboring pixels into a neighborAry
 void ImageProcessing::loadNeighbor2(int row, int col)
 {
     neighborAry[0] = zeroFramedAry[row][col + 1];
@@ -76,6 +86,7 @@ void ImageProcessing::loadNeighbor2(int row, int col)
     neighborAry[4] = zeroFramedAry[row][col];
 }
 
+//Used by first pass, it will find the minimum pixel within the neighbors
 int ImageProcessing::min()
 {
     int min = 0;
@@ -89,6 +100,7 @@ int ImageProcessing::min()
     return neighborAry[min];
 }
 
+//Used by second pass, it will find the minimum pixel within the neighbors
 int ImageProcessing::min2()
 {
     int min = 0;
@@ -106,6 +118,7 @@ int ImageProcessing::min2()
 
 }
 
+//Distance transform for first pass, it will load the neighbors for each pixel and assign the distance of the pixel
 void ImageProcessing::firstPassDistance()
 {
     for (int i = 1; i < numRows + 1; i++)
@@ -122,6 +135,8 @@ void ImageProcessing::firstPassDistance()
     }
 }
 
+//Second pass, going from bottom-up, right-left
+//Adjust the distance of the pixel from the first pass
 void ImageProcessing::secondPassDistance()
 {
     for (int i = numRows; i > 0; i--)
@@ -147,6 +162,7 @@ void ImageProcessing::secondPassDistance()
 
 }
 
+//Prints out the objects after each pass
 void ImageProcessing::prettyPrint(std::ofstream& os, int pass)
 {
     os << "Result of Pass " << pass << ": " << std::endl;
@@ -165,6 +181,7 @@ void ImageProcessing::prettyPrint(std::ofstream& os, int pass)
     }
 }
 
+//Prints the objects with background set to 0
 void ImageProcessing::print(std::ofstream& os)
 {
     os << numRows << " " << numCols << " " << newMinVal << " " << newMaxVal << std::endl;
